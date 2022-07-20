@@ -37,7 +37,8 @@ class HololensUtility
 
 private:
     std::string test_string;
-    CartesianPose prev_pose_left;
+    CartesianPose prev_pose;
+    double prev_time;
     CartesianPose prev_pose_right;
     double prev_left_time;
     double prev_right_time;
@@ -58,9 +59,10 @@ public:
                   const std::string& hand);
 
     // Convert a pose to a twist
-    void PoseToTwist(const CartesianPose& cur_pose, 
+    void PoseToTwist(const CartesianPose& cur_pose,
+                     const CartesianPose& robot_pose,
                      const std::string& hand,
-                     const double& cur_time,
+                     const double& prev_time,
                      TwistMsg& out_twist,
                      double trans_scale,
                      double rot_scale);

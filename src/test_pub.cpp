@@ -12,11 +12,12 @@ int main(int argc, char** argv)
 
     ros::Publisher geo_pose_pub = n.advertise<geometry_msgs::PoseStamped>("/left/controller", 1000);
 
-    ros::Rate loop_rate(1);
+    float rate = 1;
+    ros::Rate loop_rate(rate);
 
-    double cur_x {0.213903};
-    double cur_y {-0.0216896};
-    double cur_z {0.619689404964};
+    double cur_x {0.162942};
+    double cur_y {-0.0386004};
+    double cur_z {0.610716};
     msg.pose.position.z = cur_z;
     double increments {0.01};
     int num_increments {20};
@@ -27,16 +28,17 @@ int main(int argc, char** argv)
         msg.pose.position.x = cur_x;
         msg.pose.position.y = cur_y;
         msg.pose.position.z = msg.pose.position.z + increments;
-        msg.pose.orientation.x = -0.584;
-        msg.pose.orientation.y = 0.464;
-        msg.pose.orientation.z = -0.386;
-        msg.pose.orientation.w = 0.542;
+        msg.pose.orientation.x = 0.5154261882691636;
+        msg.pose.orientation.y = -0.49582307219529964;
+        msg.pose.orientation.z = 0.5075196946022041;
+        msg.pose.orientation.w = -0.4805404094517134;
         i = i + 1;
         if (i > num_increments){
             msg.pose.position.z = cur_z;
             i = 0;
         }
         geo_pose_pub.publish(msg);
+        std::cout << "[/left/controller] published at " << rate << " Hz" << std::endl;
         ros::spinOnce();
         loop_rate.sleep();
 

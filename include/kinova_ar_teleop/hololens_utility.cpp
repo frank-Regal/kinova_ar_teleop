@@ -12,7 +12,8 @@
 HololensUtility::HololensUtility() : 
     test_string{"[Started] Servoing Kinova with AR Hands ..."},
     prev_left_time{0},
-    prev_right_time{0}
+    prev_right_time{0},
+    prev_time{0}
 {
 
 }
@@ -29,13 +30,13 @@ void HololensUtility::GetTestString()
 
 void HololensUtility::SavePose(const CartesianPose& cartesian_pose, const std::string& hand)
 {
-    PrintPose(cartesian_pose);
-    if (hand == "left"){
-        prev_pose_left = cartesian_pose;
-    } 
-    else {
-        prev_pose_right = cartesian_pose;
-    }
+    //PrintPose(cartesian_pose);
+    //if (hand == "left"){
+    //    prev_pose_left = cartesian_pose;
+    //} 
+    //else {
+    //    prev_pose_right = cartesian_pose;
+    //}
 }
 
 void HololensUtility::PrintPose(const CartesianPose& pose)
@@ -50,50 +51,33 @@ void HololensUtility::PrintPose(const CartesianPose& pose)
 }
 
 void HololensUtility::PoseToTwist(const CartesianPose& cur_pose,
+                                  const CartesianPose& robot_pose,
                                   const std::string& hand,
                                   const double& cur_time,
                                   TwistMsg& out_twist,
                                   double trans_scale,
                                   double rot_scale)
 {
+
     // Init
-    CartesianPose prev_pose;
+    //CartesianPose prev_pose;
     double delta_t {0};
-    int hand_int {0};
+    //int hand_int {0};
+    prev_pose = robot_pose;
 
-    // Check
-    if (hand == "left"){
-        hand_int = 1;
-        prev_pose = prev_pose_left;
-        delta_t = cur_time - prev_left_time;
-        prev_left_time = cur_time;
-    }
-    else if (hand == "right"){
-        hand_int = 2;
-        prev_pose = prev_pose_right;
-        delta_t = cur_time - prev_left_time;
-        prev_right_time = cur_time;
-    }
-    else {
-        std::cout << "ERROR: Undefined string for the name of hand." << std::endl;
-        return;
-    }
+    delta_t = cur_time - prev_time;
+    std::cout << "delta_t: " << delta_t << std::endl;
 
-    std::cout << "Delta t: " << delta_t << std::endl;
+
     // Convert
     out_twist.lin_x = trans_scale * ((cur_pose.x - prev_pose.x) / delta_t);
     out_twist.lin_y = trans_scale * ((cur_pose.y - prev_pose.y) / delta_t);
     out_twist.lin_z = trans_scale * ((cur_pose.z - prev_pose.z) / delta_t);
-    out_twist.ang_x = rot_scale * ((cur_pose.theta_x - prev_pose.theta_x) / delta_t);
-    out_twist.ang_y = rot_scale * ((cur_pose.theta_y - prev_pose.theta_y) / delta_t);
-    out_twist.ang_z = rot_scale * ((cur_pose.theta_z - prev_pose.theta_z) / delta_t);
-
-    // Assign Old
-    if (hand_int == 1){
-        prev_pose_left = cur_pose;
-    }
-    else if (hand_int == 2){
-        prev_pose_right = cur_pose;
-    }
+    out_twist.ang_x = 0;//rot_scale * ((cur_pose.theta_x - prev_pose.theta_x) / 1);
+    out_twist.ang_y = 0;//rot_scale * ((cur_pose.theta_y - prev_pose.theta_y) / 1);
+    out_twist.ang_z = 0;//rot_scale * ((cur_pose.theta_z - prev_pose.theta_z) / 1);
+   
+    //prev_pose = cur_pose;
+    prev_time = cur_time;
 
 }
