@@ -9,10 +9,12 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "test_pub");
     ros::NodeHandle n;
     geometry_msgs::PoseStamped msg;
+    std::string hand_pose_sub_topic;
+    ros::param::get("/hand_pose_sub_topic",hand_pose_sub_topic);
 
-    ros::Publisher geo_pose_pub = n.advertise<geometry_msgs::PoseStamped>("/left/controller", 1000);
+    ros::Publisher geo_pose_pub = n.advertise<geometry_msgs::PoseStamped>(hand_pose_sub_topic, 1000);
 
-    float rate = 1;
+    float rate = 2;
     ros::Rate loop_rate(rate);
 
     double cur_x {0.162942};
@@ -38,7 +40,7 @@ int main(int argc, char** argv)
             i = 0;
         }
         geo_pose_pub.publish(msg);
-        std::cout << "[/left/controller] published at " << rate << " Hz" << std::endl;
+        std::cout << "[" << hand_pose_sub_topic << "] published at " << rate << " Hz" << std::endl;
         ros::spinOnce();
         loop_rate.sleep();
 

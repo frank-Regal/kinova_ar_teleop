@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <numeric>
+#include <limits>
 
 #include "ros/ros.h"
 #include "kinova_ar_teleop/hololens_utility.h"
@@ -13,80 +15,146 @@
 * Init
 */
 HololensUtility HololensUtil;
-ros::Publisher left_kortex_twist_pub_;
-ros::Publisher right_kortex_twist_pub_;
-ros::Subscriber left_hand_pose_;
-ros::Subscriber right_hand_pose_;
+ros::Publisher twist_pub_;
+ros::Subscriber hand_pose_sub_;
 ros::ServiceClient cur_cartesian_pose_;
 kortex_driver::GetMeasuredCartesianPose srv_;
 kortex_driver::TwistCommand left_twist_;
-std::string side;
+std::vector<double> msg_rates_;
+std::string hand_pose_sub_topic_;
+std::string kortex_pose_service_topic_;
+std::string kortex_twist_pub_topic_;
+double null_twist_pub_rate_;
+double cur_time_stamp_;
+double msg_time_stamp_;
+double prev_time_stamp_;
+double variance_;
+double pub_rate_;
+double rate_;
+bool is_first_pub_rate_;
+bool is_pose_received_;
+bool is_first_msg_;
 
 
+
+/*
+* grab the current estimated position of the robotic arm
+*/
 CartesianPose get_current_pose()
 {
+    // init
     CartesianPose cur_pose;
     tf2::Quaternion q;
     srv_.request.input = {};
+    
+    // call to Kinova's /<robot_name>/base/get_measured_cartesian_pose sevice
     if (cur_cartesian_pose_.call(srv_))
     {
-        cur_pose.x = srv_.response.output.x;
-        cur_pose.y = srv_.response.output.y;
-        cur_pose.z = srv_.response.output.z;
-        cur_pose.theta_x = srv_.response.output.theta_x * (M_PI/180);
-        cur_pose.theta_y = srv_.response.output.theta_y * (M_PI/180);
-        cur_pose.theta_z = srv_.response.output.theta_z * (M_PI/180);
+        // postion
+        cur_pose.x = srv_.response.output.x; // [m]
+        cur_pose.y = srv_.response.output.y; // [m]
+        cur_pose.z = srv_.response.output.z; // [m]
         
-        q.setRPY(cur_pose.theta_x,cur_pose.theta_y,cur_pose.theta_z);
+        // orientation
+        cur_pose.theta_x = srv_.response.output.theta_x * (M_PI/180); // [rad/s]
+        cur_pose.theta_y = srv_.response.output.theta_y * (M_PI/180); // [rad/s]
+        cur_pose.theta_z = srv_.response.output.theta_z * (M_PI/180); // [rad/s]
+        
+        // create quaternion to get orientation to match input pose orientation
+        q.setRPY(cur_pose.theta_x,cur_pose.theta_y,cur_pose.theta_z); 
         q = q.normalize();
+
+        // convert back to euler
         tf2::getEulerYPR(q,cur_pose.theta_z,cur_pose.theta_y,cur_pose.theta_x);
-        //HololensUtil.SavePose(cur_pose, side);
-        std::cout << "theta_x: " << cur_pose.theta_x << std::endl;
-        std::cout << "theta_y: " << cur_pose.theta_y << std::endl;
-        std::cout << "theta_z: " << cur_pose.theta_z << std::endl;
     }
     else 
     {
         ROS_ERROR("Failed to call service add_two_ints");
+        //ros::shutdown();
+        
     }
 
-    std::cout << "returned" << std::endl;
     return cur_pose;
 }
 
 /*
-* Callbacks
+* Pub & Sub Callbacks
 */
-void publish_left_twist(const ros::TimerEvent&)
+void publish_null_twist(const ros::TimerEvent&)
 {
+    double delta_t = ros::Time::now().toSec() - msg_time_stamp_;
+    
+    if (!is_pose_received_ && delta_t > (pub_rate_ + variance_))
+    {
+        // fill
+        kortex_driver::TwistCommand twist_msg;
+        twist_msg.twist.linear_x = 0;
+        twist_msg.twist.linear_y = 0;
+        twist_msg.twist.linear_z = 0;
+        twist_msg.twist.angular_x = 0;
+        twist_msg.twist.angular_y = 0;
+        twist_msg.twist.angular_z = 0;
 
+        // publish
+        twist_pub_.publish(twist_msg);
+        std::cout << "[Twist Published] Sent null" << std::endl;
+    }
+    
 }
 
-void left_hand_callback(const geometry_msgs::PoseStamped msg)
+void get_sub_rate(const double& msg_time_stamp)
 {   
-    // Init
+    // check elapsed time
+    double delta_t = msg_time_stamp - prev_time_stamp_;
+    
+    // skip first subscribed message
+    if(!is_first_msg_)
+    {
+        // assignment for first time in if statement
+        if (is_first_pub_rate_)
+        {
+            pub_rate_ = delta_t;
+            is_first_pub_rate_ = false;
+        }
+
+        // check for multiple start up and shut downs
+        if (delta_t > (pub_rate_ - variance_) && delta_t < (pub_rate_ + variance_))
+        {   
+            // average pub rates
+            msg_rates_.push_back(delta_t);
+            pub_rate_ = std::accumulate(msg_rates_.begin(),msg_rates_.end(),0.0) / msg_rates_.size();
+        }
+    }
+    prev_time_stamp_ = msg_time_stamp;
+    is_first_msg_ = false;
+}
+
+void hand_pose_callback(const geometry_msgs::PoseStamped msg)
+{   
+    // set global flag
+    is_pose_received_ = true;
+    msg_time_stamp_ = ros::Time::now().toSec();
+    get_sub_rate(msg_time_stamp_);
+
+    // init
     CartesianPose hand_pose;
     CartesianPose robot_pose;
     TwistMsg hand_twist;
     kortex_driver::TwistCommand left_twist;
     
-    // Fill
+    // fill
     hand_pose.x = msg.pose.position.x;
     hand_pose.y = msg.pose.position.y;
     hand_pose.z = msg.pose.position.z;
-    tf2::getEulerYPR(msg.pose.orientation,hand_pose.theta_z,hand_pose.theta_y,hand_pose.theta_x);
+    tf2::getEulerYPR(msg.pose.orientation, hand_pose.theta_z, hand_pose.theta_y, hand_pose.theta_x);
 
-    
-    std::cout << "Euler Conversion: " << std::endl;
-    std::cout << "Hand theta_x: " << hand_pose.theta_x << std::endl;
-    std::cout << "Hand theta_y: " << hand_pose.theta_y << std::endl;
-    std::cout << "Hand theta_z: " << hand_pose.theta_z << std::endl;
+    // call
     robot_pose = get_current_pose();
 
-    // Convert
-    HololensUtil.PoseToTwist(hand_pose,robot_pose, "left", ros::Time::now().toSec(), hand_twist, 1, 1);
+    // convert
+    HololensUtil.PoseToTwist(hand_pose,robot_pose, "left", msg_time_stamp_, hand_twist, 1, 1);
 
-    // Fill
+    // fill
     left_twist.twist.linear_x = hand_twist.lin_x;
     left_twist.twist.linear_y = hand_twist.lin_y;
     left_twist.twist.linear_z = hand_twist.lin_z;
@@ -94,38 +162,12 @@ void left_hand_callback(const geometry_msgs::PoseStamped msg)
     left_twist.twist.angular_y = hand_twist.ang_y;
     left_twist.twist.angular_z = hand_twist.ang_z;
 
-    // Publish
-    left_kortex_twist_pub_.publish(left_twist);
-}
+    // publish
+    twist_pub_.publish(left_twist);
+    std::cout << "[Twist Published] Sent filled" << std::endl;
 
-void right_hand_callback(const geometry_msgs::PoseStamped msg)
-{
-    //std::cout << "Right Hand Message Received" << std::endl;
-    // Init
-
-    CartesianPose hand_pose;
-    TwistMsg hand_twist;
-    kortex_driver::TwistCommand right_twist;
-
-    // Fill
-    hand_pose.x = msg.pose.position.x;
-    hand_pose.y = msg.pose.position.y;
-    hand_pose.z = msg.pose.position.z;
-    tf2::getEulerYPR(msg.pose.orientation,hand_pose.theta_z,hand_pose.theta_y,hand_pose.theta_x);
-
-    // Convert
-    //HololensUtil.PoseToTwist(hand_pose,"right",ros::Time::now().toSec(), hand_twist, 1, 1);
-    
-    // Fill
-    right_twist.twist.linear_x = hand_twist.lin_x;
-    right_twist.twist.linear_y = hand_twist.lin_y;
-    right_twist.twist.linear_z = hand_twist.lin_z;
-    right_twist.twist.angular_x = hand_twist.ang_x;
-    right_twist.twist.angular_y = hand_twist.ang_y;
-    right_twist.twist.angular_z = hand_twist.ang_z;
-
-    // Publish
-    right_kortex_twist_pub_.publish(right_twist);
+    // set global flag
+    is_pose_received_ = false;
 }
 
 /*
@@ -133,26 +175,33 @@ void right_hand_callback(const geometry_msgs::PoseStamped msg)
 */
 int main(int argc, char** argv)
 {
-    // Debug
-    HololensUtil.GetTestString();
+    // debug
+    HololensUtil.GetStartUpMsg();
 
+    // ros node init
     ros::init(argc,argv,"servo_with_ar_hands");
     ros::NodeHandle n;
 
-    // specify which hand and robot
-    side = "right";
-
-    // Init Pub, Sub, & Client 
-    cur_cartesian_pose_ = n.serviceClient<kortex_driver::GetMeasuredCartesianPose>("/my_gen3/base/get_measured_cartesian_pose");
-    left_hand_pose_ = n.subscribe<geometry_msgs::PoseStamped>("/left/controller", 1000, left_hand_callback);
-    right_hand_pose_ = n.subscribe<geometry_msgs::PoseStamped>("/right/controller", 1000, right_hand_callback);
-    left_kortex_twist_pub_ = n.advertise<kortex_driver::TwistCommand>("/my_gen3/in/cartesian_velocity",1000);
-    right_kortex_twist_pub_ = n.advertise<kortex_driver::TwistCommand>("/my_gen3/in/cartesian_velocity",1000);
-    //ros::Timer timer = n.createTimer(ros::Duration(0.01), publish_left_twist);
-
-    // Get Current Robot Pose
-    //get_current_pose();
-
+    // global variable init
+    /* ros params set in config/params.yaml */
+    ros::param::get("/null_twist_pub_rate", null_twist_pub_rate_);
+    ros::param::get("/kortex_pose_service_topic", kortex_pose_service_topic_);
+    ros::param::get("/kortex_twist_pub_topic", kortex_twist_pub_topic_);
+    ros::param::get("/hand_pose_sub_topic", hand_pose_sub_topic_);
+    ros::param::get("/variance", variance_);
+    pub_rate_ = std::numeric_limits<double>::infinity();
+    msg_time_stamp_ = ros::Time::now().toSec();
+    is_first_pub_rate_ = true;
+    is_pose_received_ = false;
+    is_first_msg_ = true;
+            
+    // pub, sub, & client init 
+    cur_cartesian_pose_ = n.serviceClient<kortex_driver::GetMeasuredCartesianPose>(kortex_pose_service_topic_);
+    hand_pose_sub_ = n.subscribe<geometry_msgs::PoseStamped>(hand_pose_sub_topic_, 1000, hand_pose_callback);
+    twist_pub_ = n.advertise<kortex_driver::TwistCommand>(kortex_twist_pub_topic_, 1000);
+    ros::Timer timer = n.createTimer(ros::Duration(null_twist_pub_rate_), publish_null_twist);
+    
+    // ros typical
     ros::spin();
     return 0;
 }

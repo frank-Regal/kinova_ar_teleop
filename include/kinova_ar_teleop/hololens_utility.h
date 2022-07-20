@@ -36,7 +36,7 @@ class HololensUtility
 {
 
 private:
-    std::string test_string;
+    std::string start_string;
     CartesianPose prev_pose;
     double prev_time;
     CartesianPose prev_pose_right;
@@ -51,7 +51,7 @@ public:
     ~HololensUtility();
 
     // Debug
-    void GetTestString();
+    void GetStartUpMsg();
     void PrintPose(const CartesianPose& pose);
 
     // Save the current pose of the hands

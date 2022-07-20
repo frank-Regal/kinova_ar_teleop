@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+    <rosparam 
+    command="load"
+    file="$(find kinova_ar_teleop)/config/params.yaml"
+    />
+    <!--kinova startup for single arm-->
+    <include
+    file="$(find kortex_driver)/launch/kortex_driver.launch"
+    launch-prefix="gnome-terminal --command"
+    />
+    <!--kinova startup for single arm-->
+    <!--test publisher-->
+    <node 
+    pkg="kinova_ar_teleop" 
+    type="test_pub" 
+    name="test_pub" 
+    launch-prefix="gnome-terminal --command"
+    />
+    <!--test publisher-->
+    <!--main node translating pose stamped to twist messages-->
+    <node 
+    pkg="kinova_ar_teleop" 
+    type="servo_with_ar_hands" 
+    name="servo_with_ar_hands" 
+    launch-prefix="gnome-terminal --command"
+    />
+    <!--main node translating pose stamped to twist messages-->
+</launch>
