@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+    <!--USER INPUT-->
+    <arg name="left_robot_prefix" default="left"/>
+    <arg name="right_robot_prefix" default="right"/>
+    <arg name="left_robot_ip" default="192.168.1.61"/>
+    <arg name="right_robot_ip" default="192.168.1.62"/>
+    <arg name="robot_name_" default="kinova_arm"/>
+    <!--USER INPUT-->
+    <!--ros bridge server websocket-->
+    <node 
+    pkg="rosbridge_server" 
+    type="rosbridge_websocket" 
+    name="rosbridge_websocket" 
+    launch-prefix="gnome-terminal --command"
+    />
+    <!--ros bridge server websocket-->
+    <!--kinova startup for single arm-->
+    <include file="$(find kortex_driver)/launch/kortex_dual_driver.launch" launch-prefix="gnome-terminal --command">
+    </include>
+    <!--kinova startup for single arm-->
+    
+</launch>

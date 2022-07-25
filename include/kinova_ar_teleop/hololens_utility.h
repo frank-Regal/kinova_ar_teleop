@@ -55,13 +55,11 @@ public:
     void PrintPose(const CartesianPose& pose);
 
     // Save the current pose of the hands
-    void SavePose(const CartesianPose& cartesian_pose, 
-                  const std::string& hand);
+    void SavePose(const CartesianPose& cartesian_pose);
 
     // Convert a pose to a twist
     void PoseToTwist(const CartesianPose& cur_pose,
                      const CartesianPose& robot_pose,
-                     const std::string& hand,
                      const double& prev_time,
                      TwistMsg& out_twist,
                      double trans_scale,

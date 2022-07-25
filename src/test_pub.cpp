@@ -10,7 +10,10 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
     geometry_msgs::PoseStamped msg;
     std::string hand_pose_sub_topic;
-    ros::param::get("/hand_pose_sub_topic",hand_pose_sub_topic);
+    std::string hand;
+    hand = "left";
+    std::string ns = ros::this_node::getNamespace();
+    ros::param::get("/" + ns + "/hand_pose_sub_topic", hand_pose_sub_topic);
 
     ros::Publisher geo_pose_pub = n.advertise<geometry_msgs::PoseStamped>(hand_pose_sub_topic, 1000);
 

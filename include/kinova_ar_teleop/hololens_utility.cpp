@@ -28,7 +28,7 @@ void HololensUtility::GetStartUpMsg()
     std::cout << start_string << std::endl;
 }
 
-void HololensUtility::SavePose(const CartesianPose& cartesian_pose, const std::string& hand)
+void HololensUtility::SavePose(const CartesianPose& cartesian_pose)
 {
     //PrintPose(cartesian_pose);
     //if (hand == "left"){
@@ -52,7 +52,6 @@ void HololensUtility::PrintPose(const CartesianPose& pose)
 
 void HololensUtility::PoseToTwist(const CartesianPose& cur_pose,
                                   const CartesianPose& robot_pose,
-                                  const std::string& hand,
                                   const double& cur_time,
                                   TwistMsg& out_twist,
                                   double trans_scale,

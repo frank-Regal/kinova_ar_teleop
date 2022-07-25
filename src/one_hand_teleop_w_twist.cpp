@@ -19,11 +19,12 @@ ros::Publisher twist_pub_;
 ros::Subscriber hand_pose_sub_;
 ros::ServiceClient cur_cartesian_pose_;
 kortex_driver::GetMeasuredCartesianPose srv_;
-kortex_driver::TwistCommand left_twist_;
+kortex_driver::TwistCommand twist_;
 std::vector<double> msg_rates_;
 std::string hand_pose_sub_topic_;
 std::string kortex_pose_service_topic_;
 std::string kortex_twist_pub_topic_;
+std::string ns_;
 double null_twist_pub_rate_;
 double cur_time_stamp_;
 double msg_time_stamp_;
@@ -67,7 +68,7 @@ CartesianPose get_current_pose()
     }
     else 
     {
-        ROS_ERROR("Failed to call service add_two_ints");
+        ROS_ERROR("Failed to call service %s. Ensure arm service is running!", kortex_pose_service_topic_.c_str());
         //ros::shutdown();
     }
 
@@ -94,7 +95,7 @@ void publish_null_twist(const ros::TimerEvent&)
 
         // publish
         twist_pub_.publish(twist_msg);
-        std::cout << "[Twist Published] Sent null" << std::endl;
+        std::cout << "[" << kortex_twist_pub_topic_ << "] Twist sent null" << std::endl;
     }
 }
 
@@ -136,7 +137,7 @@ void hand_pose_callback(const geometry_msgs::PoseStamped msg)
     CartesianPose hand_pose;
     CartesianPose robot_pose;
     TwistMsg hand_twist;
-    kortex_driver::TwistCommand left_twist;
+    kortex_driver::TwistCommand twist_msg;
     
     // fill
     hand_pose.x = msg.pose.position.x;
@@ -148,19 +149,19 @@ void hand_pose_callback(const geometry_msgs::PoseStamped msg)
     robot_pose = get_current_pose();
 
     // convert
-    HololensUtil.PoseToTwist(hand_pose,robot_pose, "left", msg_time_stamp_, hand_twist, 1, 1);
+    HololensUtil.PoseToTwist(hand_pose,robot_pose, msg_time_stamp_, hand_twist, 1, 1);
 
     // fill
-    left_twist.twist.linear_x = hand_twist.lin_x;
-    left_twist.twist.linear_y = hand_twist.lin_y;
-    left_twist.twist.linear_z = hand_twist.lin_z;
-    left_twist.twist.angular_x = hand_twist.ang_x;
-    left_twist.twist.angular_y = hand_twist.ang_y;
-    left_twist.twist.angular_z = hand_twist.ang_z;
+    twist_msg.twist.linear_x = hand_twist.lin_x;
+    twist_msg.twist.linear_y = hand_twist.lin_y;
+    twist_msg.twist.linear_z = hand_twist.lin_z;
+    twist_msg.twist.angular_x = hand_twist.ang_x;
+    twist_msg.twist.angular_y = hand_twist.ang_y;
+    twist_msg.twist.angular_z = hand_twist.ang_z;
 
     // publish
-    twist_pub_.publish(left_twist);
-    std::cout << "[Twist Published] Sent filled" << std::endl;
+    twist_pub_.publish(twist_msg);
+    std::cout << "[" << kortex_twist_pub_topic_ << "] Twist sent filled" << std::endl;
 
     // set global flag
     is_pose_received_ = false;
@@ -177,14 +178,15 @@ int main(int argc, char** argv)
     // ros node init
     ros::init(argc,argv,"one_hand_teleop_w_twist");
     ros::NodeHandle n;
-
+    ns_ = ros::this_node::getNamespace();
+    
     // global variable init
-    /* ros one_hand_params set in config/one_hand_params.yaml */
-    ros::param::get("/null_twist_pub_rate", null_twist_pub_rate_);
-    ros::param::get("/kortex_pose_service_topic", kortex_pose_service_topic_);
-    ros::param::get("/kortex_twist_pub_topic", kortex_twist_pub_topic_);
-    ros::param::get("/hand_pose_sub_topic", hand_pose_sub_topic_);
-    ros::param::get("/variance", variance_);
+    /* ros params set in config/<left/right>_hand_params.yaml */
+    ros::param::get("/" + ns_ + "/null_twist_pub_rate", null_twist_pub_rate_);
+    ros::param::get("/" + ns_ + "/kortex_pose_service_topic", kortex_pose_service_topic_);
+    ros::param::get("/" + ns_ + "/kortex_twist_pub_topic", kortex_twist_pub_topic_);
+    ros::param::get("/" + ns_ + "/hand_pose_sub_topic", hand_pose_sub_topic_);
+    ros::param::get("/" + ns_ + "/variance", variance_);
     pub_rate_ = std::numeric_limits<double>::infinity();
     msg_time_stamp_ = ros::Time::now().toSec();
     is_first_pub_rate_ = true;
