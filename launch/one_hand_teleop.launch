@@ -2,7 +2,7 @@
 <launch>
     <rosparam 
     command="load"
-    file="$(find kinova_ar_teleop)/config/params.yaml"
+    file="$(find kinova_ar_teleop)/config/one_hand_params.yaml"
     />
     <!--kinova startup for single arm-->
     <include
@@ -21,8 +21,8 @@
     <!--main node translating pose stamped to twist messages-->
     <node 
     pkg="kinova_ar_teleop" 
-    type="servo_with_ar_hands" 
-    name="servo_with_ar_hands" 
+    type="one_hand_teleop_w_twist" 
+    name="one_hand_teleop_w_twist" 
     launch-prefix="gnome-terminal --command"
     />
     <!--main node translating pose stamped to twist messages-->

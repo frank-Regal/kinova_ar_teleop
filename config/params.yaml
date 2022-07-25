@@ -1,5 +1,0 @@
-hand_pose_sub_topic: "/left/controller" # geometry_msgs/PoseStamped topic name for HoloLens hand tracking msgs
-kortex_pose_service_topic: "/my_gen3/base/get_measured_cartesian_pose"
-kortex_twist_pub_topic: "/my_gen3/in/cartesian_velocity"
-null_twist_pub_rate: 0.01
-variance: 0.2 # + or - variance needed for doing time comparisons

@@ -175,11 +175,11 @@ int main(int argc, char** argv)
     HololensUtil.GetStartUpMsg();
 
     // ros node init
-    ros::init(argc,argv,"servo_with_ar_hands");
+    ros::init(argc,argv,"one_hand_teleop_w_twist");
     ros::NodeHandle n;
 
     // global variable init
-    /* ros params set in config/params.yaml */
+    /* ros one_hand_params set in config/one_hand_params.yaml */
     ros::param::get("/null_twist_pub_rate", null_twist_pub_rate_);
     ros::param::get("/kortex_pose_service_topic", kortex_pose_service_topic_);
     ros::param::get("/kortex_twist_pub_topic", kortex_twist_pub_topic_);
