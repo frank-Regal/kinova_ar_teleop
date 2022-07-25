@@ -35,8 +35,6 @@ bool is_first_pub_rate_;
 bool is_pose_received_;
 bool is_first_msg_;
 
-
-
 /*
 * grab the current estimated position of the robotic arm
 */
@@ -71,7 +69,6 @@ CartesianPose get_current_pose()
     {
         ROS_ERROR("Failed to call service add_two_ints");
         //ros::shutdown();
-        
     }
 
     return cur_pose;
@@ -99,7 +96,6 @@ void publish_null_twist(const ros::TimerEvent&)
         twist_pub_.publish(twist_msg);
         std::cout << "[Twist Published] Sent null" << std::endl;
     }
-    
 }
 
 void get_sub_rate(const double& msg_time_stamp)

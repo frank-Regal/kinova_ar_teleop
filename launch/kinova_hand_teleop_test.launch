@@ -18,6 +18,14 @@
     launch-prefix="gnome-terminal --command"
     />
     <!--ros bridge server websocket-->
+    <!--test publisher-->
+    <node 
+    pkg="kinova_ar_teleop" 
+    type="test_pub" 
+    name="test_pub" 
+    launch-prefix="gnome-terminal --command"
+    />
+    <!--test publisher-->
     <!--main node translating pose stamped to twist messages-->
     <node 
     pkg="kinova_ar_teleop" 

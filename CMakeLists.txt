@@ -17,6 +17,10 @@ catkin_package(
    CATKIN_DEPENDS roscpp rospy std_msgs kortex_driver geometry_msgs tf2 tf2_ros
 )
 
+catkin_install_python(PROGRAMS scripts/hand_control.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 include_directories(
   /usr/include/eigen3/
   include
