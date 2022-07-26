@@ -1,0 +1,21 @@
+# Configuration of parameters for Kinova AR Teleop ROS Package
+#
+# Last Updated: 2022.07.25
+# Author: Frank Regal
+# Email: fregal@utexas.edu
+#
+
+# geometry_msgs/PoseStamped topic name for HoloLens hand tracking msgs
+hand_pose_sub_topic: "/controller" 
+
+# service topic used to grab current pose of kinova arm
+kortex_pose_service_topic: "/kinova_arm/base/get_measured_cartesian_pose" 
+
+# topic to publish twist commands on (used to move the robotic arm)
+kortex_twist_pub_topic: "/kinova_arm/in/cartesian_velocity" 
+
+# rate to publish stop commands
+null_twist_pub_rate: 0.01 
+
+# + or - variance needed for doing time comparisons in one_hand_teleop_w_twist node
+variance: 0.2 

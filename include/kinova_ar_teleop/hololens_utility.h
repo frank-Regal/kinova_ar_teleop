@@ -36,7 +36,7 @@ class HololensUtility
 {
 
 private:
-    std::string test_string;
+    std::string start_string;
     CartesianPose prev_pose;
     double prev_time;
     CartesianPose prev_pose_right;
@@ -51,17 +51,15 @@ public:
     ~HololensUtility();
 
     // Debug
-    void GetTestString();
+    void GetStartUpMsg();
     void PrintPose(const CartesianPose& pose);
 
     // Save the current pose of the hands
-    void SavePose(const CartesianPose& cartesian_pose, 
-                  const std::string& hand);
+    void SavePose(const CartesianPose& cartesian_pose);
 
     // Convert a pose to a twist
     void PoseToTwist(const CartesianPose& cur_pose,
                      const CartesianPose& robot_pose,
-                     const std::string& hand,
                      const double& prev_time,
                      TwistMsg& out_twist,
                      double trans_scale,

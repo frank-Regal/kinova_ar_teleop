@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<launch>
+    <!--USER INPUT-->
+    <arg name="ctrl_hand" default="left"/> 
+    <arg name="ctrl_robot_ip" default="192.168.1.61"/>
+    <arg name="robot_name" default="kinova_arm"/>
+    <!--USER INPUT-->
+    <!--ros bridge server websocket-->
+    <node 
+    pkg="rosbridge_server" 
+    type="rosbridge_websocket" 
+    name="rosbridge_websocket" 
+    launch-prefix="gnome-terminal --command"
+    />
+    <!--ros bridge server websocket-->
+    <!--create namespace-->
+    <group ns="$(arg ctrl_hand)">
+        <!--set params-->
+        <rosparam command="load" file="$(find kinova_ar_teleop)/config/params.yaml"/>
+        <param name="hand_pose_sub_topic" value="/$(arg ctrl_hand)/controller"/>
+        <param name="kortex_pose_service_topic" value="/$(arg ctrl_hand)/$(arg robot_name)/base/get_measured_cartesian_pose"/>
+        <param name="kortex_twist_pub_topic" value="/$(arg ctrl_hand)/$(arg robot_name)/in/cartesian_velocity"/>
+        <!--set params-->
+        <!--kinova startup for single arm-->
+        <include file="$(find kortex_driver)/launch/kortex_driver.launch" launch-prefix="gnome-terminal --command">
+            <arg name="ip_address" value="$(arg ctrl_robot_ip)"/>
+            <arg name="start_rviz" value="false"/>
+            <arg name="robot_name" value="$(arg robot_name)"/>
+        </include>
+        <!--kinova startup for single arm-->
+        <!--test publisher-->
+        <node 
+        pkg="kinova_ar_teleop" 
+        type="test_pub" 
+        name="test_pub" 
+        launch-prefix="gnome-terminal --command"
+        />
+        <!--test publisher-->
+        <!--main node translating pose stamped to twist messages-->
+        <node 
+        pkg="kinova_ar_teleop" 
+        type="one_hand_teleop_w_twist" 
+        name="one_hand_teleop_w_twist" 
+        launch-prefix="gnome-terminal --command"
+        />
+        <!--main node translating pose stamped to twist messages-->
+    </group>
+    <!--create namespace-->
+</launch>
