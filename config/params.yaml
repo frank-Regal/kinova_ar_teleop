@@ -17,5 +17,5 @@ kortex_twist_pub_topic: "/kinova_arm/in/cartesian_velocity"
 # rate to publish stop commands
 null_twist_pub_rate: 0.01 
 
-# + or - variance needed for doing time comparisons in one_hand_teleop_w_twist node
+# + or - variance needed for doing time comparisons in teleop_w_twist node
 variance: 0.2 

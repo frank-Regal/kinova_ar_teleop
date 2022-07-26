@@ -1,6 +1,8 @@
 <!--
-* One hand control launch file to enable the HoloLens handtracking
+* TEST FILE: One hand control launch file to enable the HoloLens handtracking
 * to control both left and right kinova arms when setup in dual arm position.
+* This specifically calls the test_pub.cpp file to track the path of PoseStamped
+* messages.
 *
 * Updated: July 2022
 * Author: Frank Regal
@@ -41,6 +43,14 @@
             <arg name="robot_name" value="$(arg robot_name)"/>
         </include>
         <!--kinova startup for single arm-->
+        <!--test publisher-->
+        <node 
+        pkg="kinova_ar_teleop" 
+        type="test_pub" 
+        name="test_pub" 
+        launch-prefix="gnome-terminal --command"
+        />
+        <!--test publisher-->
         <!--main node translating pose stamped to twist messages-->
         <node 
         pkg="kinova_ar_teleop" 

@@ -1,15 +1,31 @@
+/* 
+*  ROS node to control Kinova Gen3 arms using 
+*  geometry_msgs/PoseStamped msgs as goals. 
+*  
+*  Updated: July 2022
+*  Author: Frank Regal
+*  Email: fregal@utexas.edu
+*  
+*  See Github README for usage and development help.
+*/
+
 #include <iostream>
 #include <string>
 #include <numeric>
 #include <limits>
 
 #include "ros/ros.h"
-#include "kinova_ar_teleop/hololens_utility.h"
 #include "geometry_msgs/PoseStamped.h"
-#include "kortex_driver/TwistCommand.h"
-#include "kortex_driver/GetMeasuredCartesianPose.h"
 #include "tf2/convert.h"
 #include "tf2/utils.h"
+
+// this package include directory
+#include "kinova_ar_teleop/hololens_utility.h"
+
+// provided through the ros_kortex repo on Kinova's official GitHub
+// link: https://github.com/Kinovarobotics/ros_kortex
+#include "kortex_driver/TwistCommand.h"
+#include "kortex_driver/GetMeasuredCartesianPose.h"
 
 /*
 * Init
@@ -37,7 +53,7 @@ bool is_pose_received_;
 bool is_first_msg_;
 
 /*
-* grab the current estimated position of the robotic arm
+* Grab the current estimated position of the robotic arm
 */
 CartesianPose get_current_pose()
 {
@@ -176,12 +192,12 @@ int main(int argc, char** argv)
     HololensUtil.GetStartUpMsg();
 
     // ros node init
-    ros::init(argc,argv,"one_hand_teleop_w_twist");
+    ros::init(argc,argv,"teleop_w_twist");
     ros::NodeHandle n;
     ns_ = ros::this_node::getNamespace();
     
     // global variable init
-    /* ros params set in config/<left/right>_hand_params.yaml */
+    /* ros params set in config/params.yaml */
     ros::param::get("/" + ns_ + "/null_twist_pub_rate", null_twist_pub_rate_);
     ros::param::get("/" + ns_ + "/kortex_pose_service_topic", kortex_pose_service_topic_);
     ros::param::get("/" + ns_ + "/kortex_twist_pub_topic", kortex_twist_pub_topic_);

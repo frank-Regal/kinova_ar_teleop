@@ -1,11 +1,13 @@
 <!--
-* Two hand control launch file to enable the HoloLens handtracking
+* TEST FILE: Two hand control launch file to enable the HoloLens handtracking
 * to control both left and right kinova arms when setup in dual arm position.
+* This specifically calls the test_pub.cpp file to track the path of PoseStamped
+* messages.
 *
 * Updated: July 2022
 * Author: Frank Regal
 * Email: fregal@utexas.edu
-* 
+*  
 * See Github README for usage and development help.
 *
 * To Use: change the variables specific to your hardware in the USER INPUT section below. 
@@ -48,6 +50,14 @@
         <param name="kortex_pose_service_topic" value="/$(arg left_robot_prefix)/$(arg robot_name)/base/get_measured_cartesian_pose"/>
         <param name="kortex_twist_pub_topic" value="/$(arg left_robot_prefix)/$(arg robot_name)/in/cartesian_velocity"/>
         <!--set params-->
+        <!--test publisher-->
+        <node 
+        pkg="kinova_ar_teleop" 
+        type="test_pub" 
+        name="test_pub" 
+        launch-prefix="gnome-terminal --command"
+        />
+        <!--test publisher-->
         <!--main node translating pose stamped to twist messages-->
         <node 
         pkg="kinova_ar_teleop" 
@@ -65,6 +75,14 @@
         <param name="kortex_pose_service_topic" value="/$(arg right_robot_prefix)/$(arg robot_name)/base/get_measured_cartesian_pose"/>
         <param name="kortex_twist_pub_topic" value="/$(arg right_robot_prefix)/$(arg robot_name)/in/cartesian_velocity"/>
         <!--set params-->
+        <!--test publisher-->
+        <node 
+        pkg="kinova_ar_teleop" 
+        type="test_pub" 
+        name="test_pub" 
+        launch-prefix="gnome-terminal --command"
+        />
+        <!--test publisher-->
         <!--main node translating pose stamped to twist messages-->
         <node 
         pkg="kinova_ar_teleop" 

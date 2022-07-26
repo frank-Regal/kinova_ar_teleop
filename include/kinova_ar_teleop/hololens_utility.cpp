@@ -15,12 +15,10 @@ HololensUtility::HololensUtility() :
     prev_right_time (0),
     prev_time (0)
 {
-
 }
 
 HololensUtility::~HololensUtility()
-{
-    
+{  
 }
 
 void HololensUtility::GetStartUpMsg()
@@ -30,13 +28,6 @@ void HololensUtility::GetStartUpMsg()
 
 void HololensUtility::SavePose(const CartesianPose& cartesian_pose)
 {
-    //PrintPose(cartesian_pose);
-    //if (hand == "left"){
-    //    prev_pose_left = cartesian_pose;
-    //} 
-    //else {
-    //    prev_pose_right = cartesian_pose;
-    //}
 }
 
 void HololensUtility::PrintPose(const CartesianPose& pose)
@@ -57,30 +48,28 @@ void HololensUtility::PoseToTwist(const CartesianPose& cur_pose,
                                   double trans_scale,
                                   double rot_scale)
 {
-
     // init
     double delta_t = 0;
 
     // calculate
     delta_t = cur_time - prev_time;
 
-    // Convert
+    // convert
     out_twist.lin_x = trans_scale * ((cur_pose.x - robot_pose.x) / delta_t);
     out_twist.lin_y = trans_scale * ((cur_pose.y - robot_pose.y) / delta_t);
     out_twist.lin_z = trans_scale * ((cur_pose.z - robot_pose.z) / delta_t);
     
-    /* Don't move orientation */
+    // lock current move orientation
     out_twist.ang_x = 0;
     out_twist.ang_y = 0;
     out_twist.ang_z = 0;
 
-    /* Used to Calculate actual angular twist (NOT OPTIMIZED)
+    /* Used to Calculate actual angular twist (TODO IMPLEMENTATION)
     out_twist.ang_x = rot_scale * ((cur_pose.theta_x - robot_pose.theta_x) / 1);
     out_twist.ang_y = rot_scale * ((cur_pose.theta_y - robot_pose.theta_y) / 1);
     out_twist.ang_z = rot_scale * ((cur_pose.theta_z - robot_pose.theta_z) / 1);
     */
 
-    //prev_pose = cur_pose;
+    // update last time
     prev_time = cur_time;
-
 }
