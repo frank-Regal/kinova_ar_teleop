@@ -2,18 +2,25 @@
 #define _HOLOLENS_UTILITY_H_
 
 /* 
-* Utility used to control HoloLens 2 with Kinova Gen3 Dual Arm Setup
+* Utility used to convert position: x,y,z & orientation: r,p,y into 
+* a twist: linear x,y,z & angular x,y,z messages for servoing the arms.
 *
 * Author: Frank Regal
-* Date: 2022-07-15
+* Updated: July 2022
+* Email: fregal@utexas.edu
+*
 */
 
 #include <string>
 
 #include "ros/ros.h"
 #include "geometry_msgs/PoseStamped.h"
+
+// provided through the ros_kortex repo on Kinova's official GitHub
+// link: https://github.com/Kinovarobotics/ros_kortex
 #include "kortex_driver/TwistCommand.h"
 
+// required input format for goal poses
 struct CartesianPose {
     double x;       
     double y;       
@@ -23,6 +30,7 @@ struct CartesianPose {
     double theta_z; 
 };
 
+// required output format for twist msgs
 struct TwistMsg {
     double lin_x;
     double lin_y; 
@@ -36,6 +44,7 @@ class HololensUtility
 {
 
 private:
+    // init
     std::string start_string;
     CartesianPose prev_pose;
     double prev_time;
@@ -44,20 +53,20 @@ private:
     double prev_right_time;
 
 public:
-    // Constructor
+    // constructor
     HololensUtility();
 
-    // Destructor
+    // destructor
     ~HololensUtility();
 
-    // Debug
+    // debug
     void GetStartUpMsg();
     void PrintPose(const CartesianPose& pose);
 
-    // Save the current pose of the hands
+    // save the current pose of the hands
     void SavePose(const CartesianPose& cartesian_pose);
 
-    // Convert a pose to a twist
+    // convert a pose to a twist
     void PoseToTwist(const CartesianPose& cur_pose,
                      const CartesianPose& robot_pose,
                      const double& prev_time,

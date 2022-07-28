@@ -1,3 +1,15 @@
+/* 
+*  ROS node to publish a simple series of geometry_msgs/PoseStamped 
+*  in the z-direction for testing and debugging teleop_w_twist node 
+*  and <one/two>_hand_teleop_test.launch files.
+*  
+*  Updated: July 2022
+*  Author: Frank Regal
+*  Email: fregal@utexas.edu
+*  
+*  See Github README for usage and development help.
+*/
+
 #include <iostream>
 #include <string>
 
@@ -17,7 +29,7 @@ int main(int argc, char** argv)
 
     ros::Publisher geo_pose_pub = n.advertise<geometry_msgs::PoseStamped>(hand_pose_sub_topic, 1000);
 
-    float rate = 2;
+    float rate = 5;
     ros::Rate loop_rate(rate);
 
     double cur_x {0.162942};

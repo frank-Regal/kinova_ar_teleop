@@ -31,11 +31,11 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/hololens_utility.cpp
 )
 
-add_executable(one_hand_teleop_w_twist src/one_hand_teleop_w_twist.cpp)
+add_executable(teleop_w_twist src/teleop_w_twist.cpp)
 add_executable(test_pub src/test_pub.cpp)
 
 target_link_libraries(
-  one_hand_teleop_w_twist 
+  teleop_w_twist 
   ${catkin_LIBRARIES} 
   ${PROJECT_NAME}  
 )
