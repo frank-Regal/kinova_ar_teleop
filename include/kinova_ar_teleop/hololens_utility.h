@@ -17,7 +17,8 @@
 #include "geometry_msgs/PoseStamped.h"
 
 // provided through the ros_kortex repo on Kinova's official GitHub
-// link: https://github.com/Kinovarobotics/ros_kortex
+// official link: https://github.com/Kinovarobotics/ros_kortex
+// use the forked version for use of this package: https://github.com/frank-Regal/ros_kortex
 #include "kortex_driver/TwistCommand.h"
 
 // required input format for goal poses
