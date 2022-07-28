@@ -12,7 +12,7 @@
 
     <!-- Load the description for the robot -->
     <!-- Without gripper -->
-    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/multiple_robots/kortex_dual_robots.urdf"/>
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kinova_ar_teleop)/urdf/kortex_dual_robots.urdf"/>
     <!-- With gripper -->
 
 

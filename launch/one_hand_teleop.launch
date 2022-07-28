@@ -1,16 +1,3 @@
-<!--
-* One hand control launch file to enable the HoloLens handtracking
-* to control both left and right kinova arms when setup in dual arm position.
-*
-* Updated: July 2022
-* Author: Frank Regal
-* Email: fregal@utexas.edu
-*  
-* See Github README for usage and development help.
-*
-* To Use: change the variables specific to your hardware in the USER INPUT section below. 
--->
-
 <?xml version="1.0"?>
 <launch>
     <!--USER INPUT-->
