@@ -63,7 +63,9 @@ To control the robotic arms with the HoloLens, this package needs to be running 
 There are two methods within this package to control the robot arms. 
 
 #### Method 1:
-The first and default method via the launch files is to call a ROS node called ```teleop_w_twist```. This node subscribes to both the left and right position of the tracked hands in the HoloLens 2 on two seperate geometry_msgs/PoseStamped topics. The node takes these PoseStamped msgs everytime they are received and converts them to kortex_driver/TwistCommand msgs. This conversion is down in the hololens_utility.h file. The utility pulls the current cartesian pose of the robots from the ROS service /kinova_arm/base/get_measured_cartesian_pose, compares it to the pose of the hands, divides by a time delta, and then packages it up into a linear and angular x,y,z twist message. This twist message is then published and the ros_kortex package sends it to the onboard Kortex API where all the IK solving happens.
+The first and default method via the launch files is to call a ROS node called ```teleop_w_twist```. This node subscribes to both the left and right position of the tracked hands in the HoloLens 2 on two seperate geometry_msgs/PoseStamped topics. The node takes these PoseStamped msgs everytime they are received and converts them to kortex_driver/TwistCommand msgs. 
+
+This conversion is done in the hololens_utility.h file. The utility pulls the current cartesian pose of the robots from the ROS service /kinova_arm/base/get_measured_cartesian_pose, compares it to the pose of the hands, divides by a time delta, and then packages it up into a linear and angular x,y,z twist message. This twist message is then published and the ros_kortex package sends it to the onboard Kortex API where all the IK solving happens.
 
 #### Method 2:
 The second method is more low-level and calls the Kortex API IK solver on its own. This method is more unstable and should only be used for low-level control if need be. Work on this method is inprogress.
