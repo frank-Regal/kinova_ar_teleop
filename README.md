@@ -21,6 +21,7 @@ This package is meant to be installed on a computer that is on the same local ne
     - ```git clone https://github.com/frank-Regal/ros_kortex.git```
 3. ```cd ros_kortex``` and change to the correct branch to match your ros version. For example ```git checkout melodic-devel```
 4. Install the RosBridge Server with ```sudo apt install ros-melodic-rosbridge-suite``` or install from source [rosbridge_suite](https://github.com/RobotWebTools/rosbridge_suite/tree/ros1 'https://github.com/RobotWebTools/rosbridge_suite/tree/ros1')
+5. Install Kinova Robotics Kortex API to have access to the robot's methods. To install follow instructions on the repos readme. The python api is the only api that needs to be installed to work with this package. [GitHub - Kinovarobotics/kortex](https://github.com/Kinovarobotics/kortex 'https://github.com/Kinovarobotics/kortex')
 
 ### Clone Package
 1. Navigate to your catkin workspace src/ directory that the ros_kortex package is located in. For example: ```cd ~/catkin_ws/src```
