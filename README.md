@@ -18,13 +18,16 @@ This package is meant to be installed on a computer that is on the same local ne
 ### Install Dependencies
 1. Ensure you have ROS [Melodic](http://wiki.ros.org/melodic 'http://wiki.ros.org/melodic') installed.
 2. Create a catkin workspace and clone the following forked Kinova/ros_kortex repo [Github - frank-Regal/ros_kortex](https://github.com/frank-Regal/ros_kortex 'https://github.com/frank-Regal/ros_kortex') into the workspace.
-3. Install the RosBridge Server with ```sudo apt install ros-melodic-rosbridge-suite``` or install from source [rosbridge_suite](https://github.com/RobotWebTools/rosbridge_suite/tree/ros1 'https://github.com/RobotWebTools/rosbridge_suite/tree/ros1')
+    - ```git clone https://github.com/frank-Regal/ros_kortex.git```
+3. ```cd ros_kortex``` and change to the correct branch to match your ros version. For example ```git checkout melodic-devel```
+4. Install the RosBridge Server with ```sudo apt install ros-melodic-rosbridge-suite``` or install from source [rosbridge_suite](https://github.com/RobotWebTools/rosbridge_suite/tree/ros1 'https://github.com/RobotWebTools/rosbridge_suite/tree/ros1')
 
 ### Clone Package
 1. Navigate to your catkin workspace src/ directory that the ros_kortex package is located in. For example: ```cd ~/catkin_ws/src```
 2. Clone this repo ```git clone https://github.com/frank-Regal/kinova_ar_teleop.git```
-3. Build the catkin workspace. For example ```cd ~/catkin_ws``` and ```catkin build```
-4. Source your workspace ```source devel/setup.bash```
+3. ```cd kinova_ar_teleop``` and change to the correct branch to match your ros version. For example ```git checkout melodic-devel```
+4. Build the catkin workspace. For example ```cd ~/catkin_ws``` and ```catkin build```
+5. Source your workspace ```source devel/setup.bash```
 
 ## Running Tests
 This package contains two test launch files and a test publisher node. The test publisher node publishes a fake set of ```geometry_msgs/PoseStamped``` messages that is intended to mimic hand tragectories captured and published from the HoloLens. The test launch files launch all the nodes required to test the robotic arm functionality without actually needed a HoloLens connected and running. It is recommended you follow the following steps first before you try and control the arms with the HoloLens. If you complete these steps correctly you should see the kinova arms moving up and down in the z-direction. You can control just one arm or two arms depending on your current setup.
