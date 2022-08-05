@@ -25,9 +25,9 @@ int main(int argc, char** argv)
     std::string hand;
     hand = "left";
     std::string ns = ros::this_node::getNamespace();
-    ros::param::get("/" + ns + "/hand_pose_sub_topic", hand_pose_sub_topic);
+    //ros::param::get("/" + ns + "/hand_pose_sub_topic", hand_pose_sub_topic);
 
-    ros::Publisher geo_pose_pub = n.advertise<geometry_msgs::PoseStamped>(hand_pose_sub_topic, 1000);
+    ros::Publisher geo_pose_pub = n.advertise<geometry_msgs::PoseStamped>("/controller", 1000);
 
     float rate = 5;
     ros::Rate loop_rate(rate);
